@@ -19,23 +19,27 @@ class Student
     sql = <<-SQL
       SELECT * FROM students WHERE grade = 9
     SQL
-    array = DB[:conn].execute(sql)
+    DB[:conn].execute(sql).map {|student| new_from_db(student)}
   end
 
   def self.students_below_12th_grade
     sql = <<-SQL
       SELECT * FROM students WHERE grade < 12
     SQL
-    binding.pry
-    array = DB[:conn].execute(sql)
+    DB[:conn].execute(sql).map do |student|
+      new_from_db(student)
+    end
   end
 
   def self.find_by_name(name)
     sql = <<-SQL
       SELECT * FROM students WHERE name = (?)
     SQL
+
     row = DB[:conn].execute(sql, name)
     row.flatten! if row.size == 1
+
+    row = DB[:conn].execute(sql, name).flatten!
     new_from_db(row)
   end
 
