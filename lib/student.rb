@@ -7,7 +7,7 @@ class Student
     student.id = row[0]
     student.name = row[1]
     student.grade = row[2]
-    @@all << student
+    @@all << student unless @@all.find{|student| student.name == row[1]}
     student
   end
 
@@ -27,7 +27,7 @@ class Student
       SELECT * FROM students WHERE grade < 12
     SQL
     DB[:conn].execute(sql).map do |student|
-      new_from_db(student)
+      instance = new_from_db(student)
     end
   end
 
@@ -67,5 +67,27 @@ class Student
   def self.drop_table
     sql = "DROP TABLE IF EXISTS students"
     DB[:conn].execute(sql)
+  end
+
+  def self.first_X_students_in_grade_10(x)
+    sql = <<-SQL
+      SELECT * FROM students WHERE grade = 10 LIMIT (?)
+    SQL
+    DB[:conn].execute(sql, x)
+  end
+
+  def self.first_student_in_grade_10
+    sql = <<-SQL
+      SELECT * FROM students WHERE grade = 10 LIMIT (?)
+    SQL
+    row = DB[:conn].execute(sql, 1).flatten
+    first_student = new_from_db(row)
+  end
+
+  def self.all_students_in_grade_X(x)
+    sql = <<-SQL
+      SELECT * FROM students WHERE grade = (?)
+    SQL
+    DB[:conn].execute(sql, x)
   end
 end
