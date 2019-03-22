@@ -9,3 +9,8 @@ gem 'rspec'
 
 # Debugging
 gem 'pry'
+
+group :development, :test do
+  gem 'pry'
+  gem 'rb-readline'
+end
